@@ -1,0 +1,14 @@
+# Node / Vue
+node_modules/
+.env
+.env.local
+
+# .NET
+bin/
+obj/
+appsettings.Development.json
+*.user
+
+# IDE
+.vs/
+.vscode/settings.json

@@ -1,0 +1,317 @@
+/* ============================================================
+   Admin design polish
+   ------------------------------------------------------------
+   Applies the application's signature treatment — sheen-sweep
+   CTAs, gentle entrance motion, and navy→orange accents (the
+   same language used on the login, welcome, and dashboard) —
+   uniformly across EVERY admin page.
+
+   Loaded globally in main.js. Targets are admin-only class
+   names (.add-btn, .table-card, .manage-*, .bm-foot, .modal-foot)
+   so nothing here can leak into the public pages. Global (not
+   scoped) is also required to reach the teleported modals.
+   ============================================================ */
+
+:root {
+  /* Admin aliases point at the shared design-system tokens (single source of
+     truth in design-system.css) so colors stay in sync app-wide. */
+  --admin-navy: var(--ds-navy);
+  --admin-navy-strong: var(--ds-navy-strong);
+  --admin-orange: var(--ds-orange);
+}
+
+/* 1) Gentle entrance for each admin page ------------------------------ */
+@keyframes adminRise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.manage-users,
+.manage-classes,
+.manage-subjects,
+.teacher-assignments,
+.manage-events,
+.view-grades,
+.attendance-reports,
+.admin-settings {
+  animation: adminRise 0.45s ease both;
+}
+
+/* 2) Sheen-sweep on primary CTAs (like the login / hero buttons) ------ */
+.add-btn,
+.bm-foot .btn.primary,
+.modal-foot .btn.primary,
+.pw-form .btn.primary {
+  position: relative;
+  overflow: hidden;
+}
+.add-btn::after,
+.bm-foot .btn.primary::after,
+.modal-foot .btn.primary::after,
+.pw-form .btn.primary::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  inset-inline-start: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  transform: skewX(-20deg);
+  transition: inset-inline-start 0.6s ease;
+  pointer-events: none;
+}
+.add-btn:hover::after,
+.bm-foot .btn.primary:hover::after,
+.modal-foot .btn.primary:hover::after,
+.pw-form .btn.primary:hover::after {
+  inset-inline-start: 125%;
+}
+
+/* 3) navy→orange accent line growing across the top of a table card --- */
+.table-card {
+  position: relative;
+}
+.table-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  inset-inline-start: 14px;
+  inset-inline-end: 14px;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(90deg, var(--admin-navy), var(--admin-orange));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+  z-index: 2;
+}
+.table-card:hover::after {
+  transform: scaleX(1);
+}
+
+/* 4) Toolbar entrance offset so controls settle just after the page --- */
+.manage-users .toolbar,
+.manage-classes .toolbar,
+.manage-subjects .toolbar,
+.teacher-assignments .toolbar,
+.manage-events .toolbar,
+.view-grades .toolbar,
+.attendance-reports .toolbar {
+  animation: adminRise 0.5s ease both;
+  animation-delay: 0.04s;
+}
+
+/* 5) Data-table polish -------------------------------------------------
+   Every admin list (Users, Classes, Subjects, Assignments, Grades,
+   Attendance) renders inside the shared .table-card, so these layer on
+   top of each table's own styles uniformly: zebra rows for scannability,
+   a navy accent bar on the hovered row, and deeper avatars that gently
+   zoom on row hover. */
+.table-card tbody tr:nth-child(even) {
+  background: #f8fafc;
+}
+.table-card tbody tr:hover {
+  box-shadow: inset 3px 0 0 0 var(--admin-navy);
+}
+[dir='rtl'] .table-card tbody tr:hover {
+  box-shadow: inset -3px 0 0 0 var(--admin-navy);
+}
+.table-card .avatar {
+  box-shadow: 0 3px 8px rgba(30, 41, 59, 0.2);
+  transition: transform 0.2s ease;
+}
+.table-card tbody tr:hover .avatar {
+  transform: scale(1.08);
+}
+
+/* 6) Shared async states (loading / error cards, flash banner) reused by the
+   API-wired admin pages. Global so each scoped page doesn't re-declare them. */
+.state-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  padding: 3.5rem 1.5rem;
+  background: #fff;
+  border: 1px solid #eaeef6;
+  border-radius: 18px;
+  box-shadow: 0 8px 22px rgba(30, 41, 59, 0.05);
+  color: #6b7280;
+  font-size: 0.92rem;
+  text-align: center;
+}
+.state-card p {
+  margin: 0;
+}
+.state-card.error-state {
+  color: #b91c1c;
+}
+.state-card.error-state svg {
+  width: 34px;
+  height: 34px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.state-spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid #e2e8f0;
+  border-top-color: var(--admin-navy);
+  animation: adminSpin 0.8s linear infinite;
+}
+@keyframes adminSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.retry-btn {
+  margin-top: 0.3rem;
+  padding: 0.55rem 1.3rem;
+  border: 1px solid #e2e8f2;
+  border-radius: 10px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--admin-navy);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.retry-btn:hover {
+  background: #eef4ff;
+}
+
+/* Flash banner (success / error) shown at the top of a wired page. */
+.flash {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.1rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.flash svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.flash.success {
+  color: #15803d;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+.flash.error {
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
+.flash span {
+  flex: 1;
+}
+.flash-x {
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 0.15rem;
+  opacity: 0.6;
+  transition: opacity 0.15s ease;
+}
+.flash-x:hover {
+  opacity: 1;
+}
+.flash-x svg {
+  width: 15px;
+  height: 15px;
+}
+.flash-enter-active,
+.flash-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.flash-enter-from,
+.flash-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+/* Inline API-error banner inside a form modal (backend friendly messages). */
+.form-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-bottom: 0.2rem;
+  padding: 0.8rem 0.95rem;
+  border-radius: 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.form-error svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Disabled modal footer buttons (while submitting). */
+.bm-foot .btn:disabled,
+.cd-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Respect users who prefer reduced motion --------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .manage-users,
+  .manage-classes,
+  .manage-subjects,
+  .teacher-assignments,
+  .manage-events,
+  .view-grades,
+  .attendance-reports,
+  .admin-settings,
+  .manage-users .toolbar,
+  .manage-classes .toolbar,
+  .manage-subjects .toolbar,
+  .teacher-assignments .toolbar,
+  .manage-events .toolbar,
+  .view-grades .toolbar,
+  .attendance-reports .toolbar {
+    animation: none;
+  }
+  .add-btn::after,
+  .table-card::after,
+  .bm-foot .btn.primary::after,
+  .modal-foot .btn.primary::after,
+  .pw-form .btn.primary::after {
+    transition: none;
+  }
+  .table-card tbody tr:hover .avatar {
+    transform: none;
+  }
+}

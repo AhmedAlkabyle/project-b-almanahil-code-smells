@@ -1,0 +1,220 @@
+/* ============================================================================
+   ALMANAHIL DESIGN SYSTEM — single source of truth
+   ----------------------------------------------------------------------------
+   Loaded once globally in main.js. Every page (public + admin + future) reads
+   these tokens, so the whole app shares one look. Two ways to use it:
+
+   1) TOKENS  — reference the CSS variables (e.g. color: var(--ds-navy)).
+      Existing components map their local --navy/--orange to these, so changing
+      a value here updates the entire app.
+   2) CLASSES — opt-in helpers (.ds-btn-primary, .ds-input, .ds-card, .ds-rise…)
+      for NEW pages so they match automatically without re-writing CSS.
+
+   Grouped below: Colors · Typography · Radius · Shadows · Gradients · Spacing,
+   then the reusable component classes and keyframes.
+   ========================================================================= */
+
+:root {
+  /* ---------- Colors ---------- */
+  --ds-navy: #1e4c9a; /* primary brand navy */
+  --ds-navy-dark: #163a78; /* deep navy (gradient end) */
+  --ds-navy-strong: #2f63ba; /* lighter navy (gradient / hover) */
+  --ds-orange: #f2a03d; /* accent orange */
+  --ds-blue: #4361ee; /* avatar / info accent */
+
+  --ds-text: #0f2444; /* headings / strong text */
+  --ds-text-body: #334155; /* body text */
+  --ds-text-muted: #6b7280; /* secondary text */
+
+  --ds-border: #e6ebf4; /* input / divider border */
+  --ds-surface: #ffffff; /* card surface */
+  --ds-field-bg: #f4f7fc; /* input background */
+
+  /* Status colors (badges, banners) */
+  --ds-success: #16a34a;
+  --ds-danger: #dc2626;
+  --ds-warning: #b45309;
+
+  /* ---------- Typography ---------- */
+  --ds-font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --ds-font-ar: 'Segoe UI', 'Tahoma', system-ui, sans-serif;
+
+  /* ---------- Radius ---------- */
+  --ds-radius-sm: 11px;
+  --ds-radius: 12px; /* buttons */
+  --ds-radius-input: 14px; /* form fields */
+  --ds-radius-lg: 18px; /* cards / panels */
+  --ds-radius-xl: 22px; /* hero / auth cards */
+
+  /* ---------- Shadows ---------- */
+  --ds-shadow-card: 0 8px 22px rgba(30, 41, 59, 0.05);
+  --ds-shadow-card-hover: 0 18px 38px rgba(30, 41, 59, 0.1);
+  --ds-shadow-auth: 0 24px 60px rgba(30, 76, 154, 0.18);
+  --ds-shadow-btn: 0 10px 24px rgba(30, 76, 154, 0.3);
+  --ds-shadow-btn-hover: 0 14px 30px rgba(30, 76, 154, 0.4);
+
+  /* ---------- Gradients ---------- */
+  --ds-gradient-primary: linear-gradient(135deg, var(--ds-navy), var(--ds-navy-strong));
+  --ds-accent-bar: linear-gradient(90deg, var(--ds-navy), var(--ds-orange));
+
+  /* ---------- Focus ring ---------- */
+  --ds-focus-ring: 0 0 0 4px rgba(30, 76, 154, 0.14);
+
+  /* ---------- Spacing scale ---------- */
+  --ds-space-1: 0.25rem;
+  --ds-space-2: 0.5rem;
+  --ds-space-3: 0.75rem;
+  --ds-space-4: 1rem;
+  --ds-space-6: 1.5rem;
+  --ds-space-8: 2rem;
+}
+
+/* ============================================================================
+   REUSABLE CLASSES (opt-in) — use these on NEW pages to match automatically.
+   Existing pages keep their own scoped styles (which reference the tokens),
+   so adding these classes changes nothing that already works.
+   ========================================================================= */
+
+/* ---------- Buttons ---------- */
+.ds-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.8rem 1.4rem;
+  border: none;
+  border-radius: var(--ds-radius);
+  font-family: var(--ds-font);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.2s ease, filter 0.25s ease;
+}
+.ds-btn-primary {
+  position: relative;
+  overflow: hidden; /* clips the sheen sweep */
+  color: #fff;
+  background: var(--ds-gradient-primary);
+  box-shadow: var(--ds-shadow-btn);
+}
+/* Light sheen that sweeps across on hover (the signature button effect) */
+.ds-btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  inset-inline-start: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transform: skewX(-20deg);
+  transition: inset-inline-start 0.6s ease;
+  pointer-events: none;
+}
+.ds-btn-primary:hover:not(:disabled)::after {
+  inset-inline-start: 125%;
+}
+.ds-btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.07);
+  box-shadow: var(--ds-shadow-btn-hover);
+}
+.ds-btn-primary:disabled {
+  background: #9db8de;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.ds-btn-secondary {
+  color: var(--ds-text-body);
+  background: #f1f4fb;
+}
+.ds-btn-secondary:hover {
+  background: #e7edf7;
+}
+
+/* ---------- Inputs ---------- */
+.ds-input {
+  width: 100%;
+  padding: 0.8rem 0.95rem;
+  font-family: var(--ds-font);
+  font-size: 0.95rem;
+  color: var(--ds-text);
+  background: var(--ds-field-bg);
+  border: 1.5px solid var(--ds-border);
+  border-radius: var(--ds-radius-input);
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+.ds-input:focus {
+  background: #fff;
+  border-color: var(--ds-navy);
+  box-shadow: var(--ds-focus-ring);
+}
+
+/* ---------- Cards ---------- */
+.ds-card {
+  background: var(--ds-surface);
+  border: 1px solid #eaeef6;
+  border-radius: var(--ds-radius-lg);
+  box-shadow: var(--ds-shadow-card);
+}
+.ds-card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.ds-card-hover:hover {
+  transform: translateY(-3px);
+  border-color: #dbe3f2;
+  box-shadow: var(--ds-shadow-card-hover);
+}
+
+/* ---------- Animations ---------- */
+.ds-rise {
+  animation: ds-rise 0.45s ease both;
+}
+.ds-float {
+  animation: ds-float 3.5s ease-in-out infinite;
+}
+
+@keyframes ds-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes ds-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes ds-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+@keyframes ds-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-rise,
+  .ds-float {
+    animation: none;
+  }
+}
